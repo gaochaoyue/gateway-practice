@@ -1,0 +1,50 @@
+logging.level.org.springframework.cloud.gateway: TRACE
+#management.endpoints.web.exposure.include: *
+spring:
+  application:
+    name: gateway
+#  cloud:
+#    gateway:
+#      routes:
+#      - id: route
+#          uri: lb://service-provide
+#        uri: http://localhost:8000
+#        predicates:
+#        - Path=/api/**
+#        filters:
+#        - StripPrefix=1
+  cloud:
+    gateway:
+      routes:
+#       discoveryClient 结合 gateway 的用法
+        - id: loadbalance
+          uri: lb://service-provide
+          predicates:
+            - Path=//service-provide
+#          StripPrefix解释 ：StripPrefix 为一个数字，该数字n 将uri路径前面的n层路径可以去除
+#          注意： 此项结合 predicates: -Path=/api/** 使用
+#          etc:  StripPrefix=1 时，访问路径为：/api/info ——> /info
+#          filters:
+#            - StripPrefix=1
+#         RewritePath的用法是不在discoveryClient 结合的情况下用的，将  /api/**  -> /**
+#         类似于 结合
+#          filters:
+#            - StripPrefix=1
+#          filters:
+#             - RewritePath=/api/(?<segment>.*), /$\{segment}
+      discovery:
+         locator:
+           enabled: true
+           lowerCaseServiceId: true
+
+
+
+
+eureka.client.service-url.defaultZone: http://localhost:8762/eureka
+
+eureka.instance.prefer-ip-address: true
+#eureka:
+#  client:
+#    enabled: false
+server:
+  port: 1000
